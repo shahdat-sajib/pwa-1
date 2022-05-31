@@ -16,16 +16,24 @@ self.addEventListener('install', (evt => {
     // console.log('service worker has been installed');
     evt.waitUntill(
         caches.open(staticCacheName).then(cache => {
-        console.log('caching shell assets');
-        cache.addAll(assets);
+            console.log('caching shell assets');
+            cache.addAll(assets);
         })
     );
-    
+
 }));
 
 //activate service worker
 self.addEventListener('activate', evt => {
     // console.log('Service worker has been activated');
+    evt.waitUntill(caches.keys().then(keys => {
+        // console.log(keys);
+        return Promise.all(keys
+            .filter(key => key !== staticCacheName)
+            .map(key => caches.delete(key)
+            ))
+    })
+    );
 });
 
 //fetch event
